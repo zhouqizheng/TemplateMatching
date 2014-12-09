@@ -13,16 +13,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]){
     cv::Mat frame( mxGetM( prhs[0]), mxGetN( prhs[0]), CV_8U);
     for( int i = 0; i < frame.rows; ++i){
         for( int j = 0; j < frame.cols; ++j){
-            frame.at< unsigned char>( i, j) = *( ma + j*frame.cols + i);
+            frame.at< unsigned char>( i, j) = *( ma + j*frame.rows + i);
         }
     }
     
     // Copy mxArray template to cv::Mat template
-    ma = ( unsigned char*) mxGetPr( prhs[1]);
+    ma = ( unsigned char*)mxGetPr( prhs[1]);
     cv::Mat model( mxGetM( prhs[1]), mxGetN( prhs[1]), CV_8U);
     for( int i = 0; i < model.rows; ++i){
         for( int j = 0; j < model.cols; ++j){
-            model.at< unsigned char>( i, j) = *( ma + j*model.cols + i);
+            model.at< unsigned char>( i, j) = *( ma + j*model.rows + i);
         }
     }
     
@@ -33,7 +33,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]){
     cv::Rect searchWindow;  
     searchWindow.width = model.cols * 3;  
     searchWindow.height = model.rows * 3;  
-    searchWindow.x = range[2] - 1 + model.cols * 0.5 - searchWindow.width * 0.5;  
+    searchWindow.x = range[1] - 1 + model.cols * 0.5 - searchWindow.width * 0.5;  
     searchWindow.y = range[0] - 1 + model.rows * 0.5 - searchWindow.height * 0.5;  
     searchWindow &= cv::Rect(0, 0, frame.cols, frame.rows);
     
