@@ -5,7 +5,8 @@ function template_match
 
     % Load video
     vid = VideoReader( vidPath);
-    
+    origVidFrames = vid.read();
+  
     %Global variable
     global numberOfFrames numberOfRows numberOfCols numberOfRowsTem numberOfColsTem
     numberOfFrames = vid.numberOfFrames;
@@ -17,7 +18,7 @@ function template_match
     imshow( frameOne);
     % xmin ymin width height]
     pos = getPosition( imrect);
-    grayFrameOne = im2double( rgb2gray( frameOne));
+    grayFrameOne = double( rgb2gray( frameOne));
     model = grayFrameOne( round( pos(2) : pos(2)+pos(4)), round( pos(1) : pos(1)+pos(3)), :);
     [ numberOfRowsTem, numberOfColsTem,] = size( model);
     
@@ -29,8 +30,8 @@ function template_match
     for k = 2 : 1 : numberOfFrames
         row = round( pos(2));
         col = round( pos(1));
-        origFrame = vid.read( k);
-        grayFrame = im2double( rgb2gray( origFrame));
+        origFrame = origVidFrames( :, :, :, k);
+        grayFrame = double( rgb2gray( origFrame));
         [ model, bestSimilarity, row, col] = tracking( grayFrame, model, row, col);
         origFrame( [ row, row+numberOfRowsTem-1], col : col+numberOfColsTem-1, 1) = 255;
         origFrame( [ row, row+numberOfRowsTem-1], col : col+numberOfColsTem-1, 2:3) = 0;
@@ -53,12 +54,21 @@ function [ model, bestSimilarity, row, col] = tracking( frame, model, rowStart, 
     %Global variable
     global numberOfRows numberOfCols numberOfRowsTem numberOfColsTem;
     rowStart = round( rowStart - numberOfRowsTem);
+    colStart = round( colStart - numberOfColsTem);
+    rowEnd = rowStart + 2*numberOfRowsTem;
+    colEnd = colStart + 2*numberOfColsTem;
+    
     if rowStart < 1
         rowStart = 1;
     end
-    colStart = round( colStart - numberOfColsTem);
     if colStart  < 1
         colStart = 1;
+    end
+    if rowEnd > ( numberOfRows - numberOfRowsTem + 1)
+        rowEnd = numberOfRows - numberOfRowsTem + 1;
+    end
+    if colEnd > ( numberOfCols - numberOfColsTem + 1)
+        colEnd = numberOfCols - numberOfColsTem + 1;
     end
     
 %     %% ---------------------------------------------------------------------------
@@ -71,19 +81,10 @@ function [ model, bestSimilarity, row, col] = tracking( frame, model, rowStart, 
 %         colEnd = numberOfCols;
 %     end
 %     
-%     [ bestSimilarity, row, col] = matchTemplate( frame, model, [ rowStart, rowEnd, colStart, colEnd]);
+%     [ bestSimilarity, row, col] = matchTemplate( frame, model, [ rowStart, colStart]);
 %     row = round( row);
 %     col = round( col);
 %     %% ---------------------------------------------------------------------------
-    
-    rowEnd = rowStart + 2*numberOfRowsTem;
-    if rowEnd > ( numberOfRows - numberOfRowsTem + 1)
-        rowEnd = numberOfRows - numberOfRowsTem + 1;
-    end
-    colEnd = colStart + 2*numberOfColsTem;
-    if colEnd > ( numberOfCols - numberOfColsTem + 1)
-        colEnd = numberOfCols - numberOfColsTem + 1;
-    end
     
     row = rowStart;
     col = colStart;

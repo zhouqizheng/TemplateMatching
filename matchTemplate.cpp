@@ -38,8 +38,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]){
     searchWindow &= cv::Rect(0, 0, frame.cols, frame.rows);
     
     cv::Mat similarityMat;
-//     cv::matchTemplate( frame( cv::Range( range[0]-1, range[1]), cv::Range( range[2]-1, range[3])), 
-//             model, similarityMat, CV_TM_CCOEFF_NORMED);
     cv::matchTemplate( frame( searchWindow), model, similarityMat, CV_TM_CCOEFF_NORMED);
     double bestSimilarity;  
     cv::Point point;  
